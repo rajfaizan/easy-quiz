@@ -1,12 +1,13 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\UserQuizController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('home');
+    return view('admin.main');
 });
 
 // Route::get('/home', function () {
@@ -17,3 +18,4 @@ Route::resource('auth', AuthController::class);
 Route::post('auth/login', [AuthController::class,'login'])->name('login');
 Route::resource('quiz', UserQuizController::class);
 Route::resource('teacher', TeacherController::class);
+Route::resource('admin', AdminController::class);
