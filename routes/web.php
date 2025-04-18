@@ -7,7 +7,7 @@ use App\Http\Controllers\UserQuizController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('admin.main');
+    return view('teacher.add_quiz');
 });
 
 // Route::get('/home', function () {

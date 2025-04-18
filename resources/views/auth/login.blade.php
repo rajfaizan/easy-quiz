@@ -134,6 +134,18 @@
                         <input type="password" class="form-control" id="password_confirmation"
                             name="password_confirmation" placeholder="Confirm Password">
                     </div>
+                    <div class="mb-3">
+                        <label for="semester" class="form-label">Semester</label>
+                        <select class="form-select" id="semester" name="semester">
+                            <option selected>Choose...</option>
+                            <option value="1">Semester 1</option>
+                            <option value="2">Semester 2</option>
+                            <option value="4">Semester 3</option>
+                            <option value="5">Semester 4</option>
+                            <option value="6">Semester 5</option>
+                            <option value="7">Semester 6</option>
+                        </select>
+                    </div>
                     <button type="submit" class="btn btn-primary">Register</button>
                 </form>
             </div>

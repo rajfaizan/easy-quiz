@@ -17,7 +17,10 @@
                 <option selected>Choose...</option>
                 <option value="1">Semester 1</option>
                 <option value="2">Semester 2</option>
-                <option value="3">Semester 3</option>
+                <option value="4">Semester 3</option>
+                <option value="5">Semester 4</option>
+                <option value="6">Semester 5</option>
+                <option value="7">Semester 6</option>
             </select>
         </div>
         <div class="mb-3">
@@ -70,4 +73,4 @@
         document.getElementById('questions').appendChild(newQuestion);
     });
 </script>
-@endsection 
+@endsection
