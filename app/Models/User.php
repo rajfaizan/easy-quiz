@@ -41,4 +41,14 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function quiz()
+    {
+        return $this->hasMany(quiz::class,'teacher_id','id');
+    }
+
+    public function scores()
+{
+    return $this->hasMany(UserScore::class);
+}
 }

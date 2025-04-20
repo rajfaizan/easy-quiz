@@ -18,6 +18,7 @@ class AdminSeeder extends Seeder
             'password' => bcrypt('admin'),
             'role'  => 3,
             'name' => 'Admin',
+            'semester' => 1,
         ];
 
         $check = User::whereEmail($data['email'])->first();

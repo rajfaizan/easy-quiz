@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Add Quiz')
+@section('title', 'Edit Quiz')
 
 @section('content')
     <style>
@@ -36,10 +36,11 @@
 
     <div class="container py-5">
         <div class="quiz-card">
-            <h1 class="mb-4 text-center">📝 Add New Quiz</h1>
+            <h1 class="mb-4 text-center">✏️ Edit Quiz</h1>
 
-            <form id="quizForm" method="POST" action="{{ route('teacher.store') }}">
+            <form id="quizForm" method="POST" action="{{ route('teacher.update', $quiz->id) }}">
                 @csrf
+                @method('PUT')
                 @if ($errors->any())
                     <div class="alert alert-danger">
                         <ul class="mb-0">
@@ -51,44 +52,42 @@
                 @endif
                 <div class="mb-3">
                     <label for="title" class="form-label">📘 Quiz Title</label>
-                    <input type="text" class="form-control" id="title" name="title" placeholder="Enter quiz title">
+                    <input type="text" class="form-control" id="title" name="title" value="{{ old('title', $quiz->name) }}" placeholder="Enter quiz title">
                 </div>
 
                 <div class="mb-3">
                     <label for="semester" class="form-label">🎓 Semester</label>
                     <select class="form-select" id="semester" name="semester">
-                        <option selected disabled>Choose...</option>
-                        <option value="1">Semester 1</option>
-                        <option value="2">Semester 2</option>
-                        <option value="3">Semester 3</option>
-                        <option value="4">Semester 4</option>
-                        <option value="5">Semester 5</option>
-                        <option value="6">Semester 6</option>
+                        <option disabled>Choose...</option>
+                        @foreach ([1, 2, 3, 4, 5, 6] as $sem)
+                            <option value="{{ $sem }}" {{ old('semester', $quiz->semester) == $sem ? 'selected' : '' }}>Semester {{ $sem }}</option>
+                        @endforeach
                     </select>
                 </div>
 
                 <div class="mb-3">
                     <label for="description" class="form-label">🗒️ Description</label>
-                    <textarea class="form-control" id="description" name="description" rows="3" placeholder="Enter quiz description"></textarea>
+                    <textarea class="form-control" id="description" name="description" rows="3" placeholder="Enter quiz description">{{ old('description', $quiz->description) }}</textarea>
                 </div>
 
                 <div id="questions">
-                    <div class="question-block mb-4">
-                        <button type="button" class="btn btn-sm btn-danger remove-question d-none">Remove</button>
-                        <h5>Question 1</h5>
-                        <input type="text" class="form-control mb-3" name="questions[]" placeholder="Enter question">
-
-                        @for ($i = 1; $i <= 4; $i++)
-                            <div class="form-check mb-2 d-flex align-items-center">
-                                <input class="form-check-input me-2" type="radio" name="correct_answer[0]" value="option{{ $i }}">
-                                <input type="text" class="form-control" name="options[0][]" placeholder="Option {{ $i }}">
-                            </div>
-                        @endfor
-                    </div>
+                    @foreach ($quiz->questions as $index => $question)
+                        <div class="question-block mb-4">
+                            <button type="button" class="btn btn-sm btn-danger remove-question {{ $index === 0 ? 'd-none' : '' }}">Remove</button>
+                            <h5>Question {{ $index + 1 }}</h5>
+                            <input type="text" class="form-control mb-3" name="questions[]" value="{{ old('questions.' . $index, $question->name) }}" placeholder="Enter question">
+                            @foreach ($question->options as $optIndex => $option)
+                                <div class="form-check mb-2 d-flex align-items-center">
+                                    <input class="form-check-input me-2" type="radio" name="correct_answer[{{ $index }}]" value="option{{ $optIndex + 1 }}" {{ old('correct_answer.' . $index, $option->is_correct ? 'option' . ($optIndex + 1) : '') === 'option' . ($optIndex + 1) ? 'checked' : '' }}>
+                                    <input type="text" class="form-control" name="options[{{ $index }}][]" value="{{ old('options.' . $index . '.' . $optIndex, $option->name) }}" placeholder="Option {{ $optIndex + 1 }}">
+                                </div>
+                            @endforeach
+                        </div>
+                    @endforeach
                 </div>
 
                 <button type="button" class="btn btn-secondary" id="add-question">Add Question</button>
-                <button type="submit" class="btn btn-primary">✅ Submit</button>
+                <button type="submit" class="btn btn-primary">✅ Save Changes</button>
             </form>
         </div>
     </div>
@@ -100,7 +99,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script>
-        let questionIndex = 1;
+        let questionIndex = {{ count($quiz->questions) }};
 
         // Add new question
         document.getElementById('add-question').addEventListener('click', function() {
@@ -194,8 +193,8 @@
 
             // If validation passes, submit form via AJAX
             $.ajax({
-                url: '{{ route("teacher.store") }}',
-                type: 'POST',
+                url: '{{ route("teacher.update", $quiz->id) }}',
+                type: 'POST', // Laravel expects POST for _method=PUT
                 data: $('#quizForm').serialize(),
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -204,18 +203,18 @@
                     if (response.success) {
                         Swal.fire({
                             title: 'Success!',
-                            text: response.message || 'Quiz created successfully!',
+                            text: response.message || 'Quiz updated successfully!',
                             icon: 'success',
                             confirmButtonText: 'OK'
                         }).then(() => {
                             window.location.href = '{{ route("teacher.create") }}'; // Redirect to quizzes list
                         });
                     } else {
-                        showToastError(response.message || 'Failed to create quiz.');
+                        showToastError(response.message || 'Failed to update quiz.');
                     }
                 },
                 error: function(xhr) {
-                    const errorMessage = xhr.responseJSON?.message || 'Failed to create quiz.';
+                    const errorMessage = xhr.responseJSON?.message || 'Failed to update quiz.';
                     showToastError(errorMessage);
                 }
             });

@@ -18,6 +18,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->tinyInteger('role'); // 1 => for user , 2 => for teacher, 3 => for admin
+            $table->tinyInteger('semester');
             $table->rememberToken();
             $table->timestamps();
         });

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Models\User;
+use Auth;
 use Illuminate\Http\Request;
 
 class AuthController extends Controller
@@ -20,9 +21,11 @@ class AuthController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(RegisterRequest $request)
+    public function create(Request $request)
     {
+        Auth::logout();
 
+        return redirect()->route('auth.index');
     }
 
     /**
@@ -37,8 +40,8 @@ class AuthController extends Controller
 
         unset($data['password_confirmation']);
 
-        User::create($data);
-
+        $user = User::create($data);
+        Auth::login($user);
         return response()->json(['success' => true, 'redirectUrl' => route('quiz.index')]);
     }
 
@@ -81,10 +84,11 @@ class AuthController extends Controller
         $user = User::where('email', $data['email'])->first();
 
         if ($user && password_verify($data['password'], $user->password)) {
+            Auth::login($user); // ✅ Log the user in so auth()->user() works
             if($user->role == 1){
                 return response()->json(['success' => true, 'redirectUrl' => route('quiz.index')]);
             } else if($user->role == 2){
-                return response()->json(['success' => true, 'redirectUrl' => route('teacher.index')]);
+                return response()->json(['success' => true, 'redirectUrl' => route('teacher.create')]);
             } else if($user->role == 3){
                 return response()->json(['success' => true, 'redirectUrl' => route('admin.index')]);
             }
